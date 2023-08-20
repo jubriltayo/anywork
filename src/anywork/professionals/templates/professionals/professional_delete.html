@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+</head>
+<body>
+    {% block header %}
+        <h2>Our Esteemed Professionals</h2>
+    {% endblock %}
+
+    {% block content %}
+        <form action="." method="POST"> {% csrf_token %}
+            <h3> {{ object.name }} are you sure you no longer want to offer your service?</h3>
+            <input type="submit" value="Yes"/> <a href="../">Cancel</a>
+        </form>
+    {% endblock %}
+</body>
+</html>

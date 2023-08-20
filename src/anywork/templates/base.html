@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} AnyWork {% endblock %}</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+
+    {%comment%} <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script> 
+    {%endcomment%}
+
+</head>
+<body>
+    <header>    
+        {% block topic %}
+            <h1 class="bg-info">AnyWork</h1>
+        {% endblock %}
+
+        
+        {% block header %}
+        {% endblock %}
+
+
+        {% block content %}
+            <h1>This is the base</h1>
+        {% endblock %}
+
+        
+        {% block register %}
+        {% endblock %}
+
+
+        {% block services %}
+        {% endblock %}
+    </header>
+
+    {% block card %}
+    {% endblock %}
+
+
+    <footer>
+        {% include "footer.html" %}
+    </footer>
+</body>
+</html>

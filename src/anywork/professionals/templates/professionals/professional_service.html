@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% block header %}
+        <h2>Our Esteemed Professionals</h2>
+    {% endblock %}
+
+    {% block content %}
+        {% for item in object_list %}
+            <h4>{{item.name }}</h4>
+            <p>{{ item.service }}</p>
+            <p>{{ item.phone_number }}</p>
+            <p>{{ item.email }}</p>
+            <p>{{ item.address }}</p>
+            <p>{{ item.qualification }}</p>
+            <p>{{ item.years_of_experience }}</p>
+            <p>{{ item.price }}</p>
+        {% endfor %}
+    {% endblock %}
+</body>
+</html>

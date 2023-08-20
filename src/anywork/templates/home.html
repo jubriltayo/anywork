@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+<body>
+    {% block content %}
+        <h2 > {{ motto }} </h2>
+        <p> {{ about }}</p>
+    {% endblock %}
+
+    {% block register %}
+        <h4><a href="{% url 'professional-create' %}"> Offer service </a></h4>
+    {% endblock %}
+    
+    {% block services %}
+    <h3>Services</h3>
+        {% for service in services %}
+            <button><a href="professional/{{service}}">{{ service }}</a></button></br>
+        {% endfor %}
+    {% endblock %}
+
+    <!-- Professionals profile -->
+    {% block card %}
+        {% for item in object_list %}
+            <h4>{{item.name }}</h4>
+            <p>{{ item.service }}</p>
+            <p>{{ item.qualification }}</p>
+            <p>{{ item.years_of_experience }}</p>
+            <button>{{ item.price }}</button>
+
+        {% endfor %}
+    {% endblock %}
+
+</body>
+</html>

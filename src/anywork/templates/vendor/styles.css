@@ -1,0 +1,7 @@
+
+.hero {
+    max-width: 100%;
+    background-size: cover;
+    height: auto;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("hero.jpg") center/cover;
+}
