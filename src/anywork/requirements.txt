@@ -1,0 +1,4 @@
+Django
+dj-database-url==2.1.0
+gunicorn
+psycopg2
