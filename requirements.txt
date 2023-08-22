@@ -3,3 +3,4 @@ dj-database-url==2.1.0
 gunicorn
 psycopg2
 django-bootstrap-v5
+fontawesomefree
