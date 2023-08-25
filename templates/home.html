@@ -10,7 +10,7 @@
 <body>
     {% block content %}
         <div class="container-fluid hero text-white">
-            <div class="row pt-3 px-3">
+            <div class="row py-3 px-3">
                 <div class="col-sm-12 col-lg-8">
                     <div class="px-2 pb-5">
                         <h1 class="display-4"> {{ motto }} </h1>
@@ -22,8 +22,8 @@
                 </div>
     {% endblock %}
     {% block services %}
-                <div class="col-sm-12 col-lg-4">
-                    <div class="m-auto">
+                <div class="col-sm-12 col-lg-4"> <!--hide in small screen-->
+                    <div class="mx-auto">
                         <h3>Services</h3>
                             {% for service in services %}
                                 <button><a href="professional/{{service}}">{{ service }}</a></button></br>
