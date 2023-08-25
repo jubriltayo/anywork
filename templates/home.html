@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,20 +9,32 @@
 </head>
 <body>
     {% block content %}
-        <h2 > {{ motto }} </h2>
-        <p> {{ about }}</p>
+        <div class="container-fluid hero text-white">
+            <div class="row pt-3 px-3">
+                <div class="col-sm-12 col-lg-8">
+                    <div class="px-2 pb-5">
+                        <h1 class="display-4"> {{ motto }} </h1>
+                        <p class="text-bold">{{ about }}</p>
+                    </div>
+                    <div class="pt-5">
+                        <a class="h4" href="{% url 'professional-create' %}"><span class="fa fa-play"></span> Offer service </a>
+                    </div>
+                </div>
     {% endblock %}
-
-    {% block register %}
-        <h4><a href="{% url 'professional-create' %}"> Offer service </a></h4>
-    {% endblock %}
-    
     {% block services %}
-    <h3>Services</h3>
-        {% for service in services %}
-            <button><a href="professional/{{service}}">{{ service }}</a></button></br>
-        {% endfor %}
+                <div class="col-sm-12 col-lg-4">
+                    <div class="m-auto">
+                        <h3>Services</h3>
+                            {% for service in services %}
+                                <button><a href="professional/{{service}}">{{ service }}</a></button></br>
+                            {% endfor %}
+                    </div>
+                </div>
     {% endblock %}
+            </div>
+        </div>
+
+
 
     <!-- Professionals profile -->
     {% block card %}

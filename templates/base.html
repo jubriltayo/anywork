@@ -1,12 +1,17 @@
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} AnyWork {% endblock %}</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
 
 
     {%comment%} <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script> 
@@ -16,7 +21,7 @@
 <body>
     <header>    
         {% block topic %}
-            <h1 class="bg-info">AnyWork</h1>
+            <h1 class="px-5 py-3 mb-0">AnyWork</h1>
         {% endblock %}
 
         
@@ -26,10 +31,6 @@
 
         {% block content %}
             <h1>This is the base</h1>
-        {% endblock %}
-
-        
-        {% block register %}
         {% endblock %}
 
 
