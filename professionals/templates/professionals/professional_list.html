@@ -8,20 +8,51 @@
 </head>
 <body>
     {% block header %}
-        <h2>Our Esteemed Professionals</h2>
+        <h3 class="container text-primary py-4">Our Esteemed Professionals</h3>
     {% endblock %}
 
     {% block content %}
-        {% for item in object_list %}
-            <h4>{{item.name }}</h4>
-            <p>{{ item.service }}</p>
-            <p>{{ item.phone_number }}</p>
-            <p>{{ item.email }}</p>
-            <p>{{ item.address }}</p>
-            <p>{{ item.qualification }}</p>
-            <p>{{ item.years_of_experience }}</p>
-            <p>{{ item.price }}</p>
-        {% endfor %}
+        <div class="container">
+            <div class="row justify-content-center">
+                {% for item in object_list %}
+                    <div class="col-lg-3 col-md-4 d-flex">
+                        <div class="card border-primary px-5 py-3 my-3 m-auto">
+                            <div class="card-title px-auto pt-3">
+                                <i class="fa-solid fa-user pe-3"> </i><span class="h6">{{ item.name }}</span><br>
+                                <hr>
+                            </div>
+                            <div class="card-text">
+                                <i class="fa-solid fa-certificate pe-3"> </i><span>{{ item.service }}</span><br>
+                                <hr>
+                                <i class="fa-solid fa-user-graduate pe-3"> </i><span>{{ item.qualification }}</span><br>
+                                <i class="fa-solid fa-briefcase pe-3"> </i><span>{{ item.years_of_experience }} </span><br>
+                                <hr>
+                                <div class="text-center">
+                                    <i class="fa-solid fa-phone pe-3"></i><br><span>{{ item.phone_number }}</span><br><br>
+                                    <i class="fa-solid fa-envelope pe-3"> </i><br><span class="small">{{ item.email }} </span><br><br>
+                                    <i class="fa-solid fa-location-dot pe-3"> </i><br><span class="small">{{ item.address }} </span><br>
+
+                                </div>
+                                <hr>
+                            </div>
+                            <div class="card-text text-center py-2">
+                                <a class="link text-white" href="tel:{{item.phone_number}}"><button class="btn btn-primary"> {{ item.price }}</button></a>
+                                
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+                <!-- <h4>{{item.name }}</h4>
+                <p>{{ item.service }}</p>
+                <p>{{ item.phone_number }}</p>
+                <p>{{ item.email }}</p>
+                <p>{{ item.address }}</p>
+                <p>{{ item.qualification }}</p>
+                <p>{{ item.years_of_experience }}</p>
+                <p>{{ item.price }}</p> -->
+        
     {% endblock %}
 </body>
 </html>

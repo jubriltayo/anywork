@@ -4,7 +4,31 @@
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    /* width: 100%;
-    position: relative; */
     height: auto;
+}
+
+.topic {
+    background-color:midnightblue;
+}
+
+.link {
+    text-decoration: none;
+}
+
+@media (max-width: 991px) {
+    #service-lg {
+        display: none;
+    }
+    #service-sm {
+        display:block;
+    }
+}
+
+@media (min-width: 992px) {
+    #service-lg {
+        display: block;
+    }
+    #service-sm {
+        display:none;
+    }
 }

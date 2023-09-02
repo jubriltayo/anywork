@@ -91,8 +91,8 @@ class RawProfessionalForm(forms.Form):
                                           widget=forms.Textarea(
                                               attrs={
                                                   "placeholder": "Address", 
-                                                  "rows": 10,
-                                                  "cols": 60
+                                                  "rows": 5,
+                                                  "cols": 25
                                               }
                                           ))
     service             = forms.ChoiceField(widget=forms.RadioSelect, choices=OPTIONS)
@@ -100,9 +100,9 @@ class RawProfessionalForm(forms.Form):
     qualification       = forms.CharField(label='', 
                                           widget=forms.Textarea(
                                               attrs={
-                                                  "placeholder": "Qualification", 
-                                                  "rows": 10,
-                                                  "cols": 40
+                                                  "placeholder": "e.g. BSc", 
+                                                  "rows": 5,
+                                                  "cols": 25
                                               }
                                           ))
     price               = forms.IntegerField(initial=500, 

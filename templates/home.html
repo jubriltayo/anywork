@@ -16,37 +16,72 @@
                         <h1 class="display-4"> {{ motto }} </h1>
                         <p class="text-bold">{{ about }}</p>
                     </div>
-                    <div class="pt-5">
-                        <a class="h4" href="{% url 'professional-create' %}"><span class="fa fa-play"></span> Offer service </a>
+                    <div class="pt-5 flex">
+                        <a class="h4 btn btn-primary px-3" href="{% url 'professional-create' %}"><span class="pe-1 fa fa-play"></span> Offer service </a>
+                        <a class="h4 btn btn-dark px-3" href="professional"><span class="pe-1 fa fa-user-tie"></span> Hire Professional </a>
                     </div>
                 </div>
     {% endblock %}
     {% block services %}
-                <div class="col-sm-12 col-lg-4"> <!--hide in small screen-->
-                    <div class="mx-auto">
-                        <h3>Services</h3>
+                <div id="service-lg" class="col-sm-12 col-lg-4 text-center my-3"> <!--hide in small screen-->
+                    <div class="m-auto bg-white rounded">
+                        <h3 class="text-dark py-2">Services</h3>
+                        <div class="divider pt-1 bg-dark"></div>
+                        <br>
                             {% for service in services %}
-                                <button><a href="professional/{{service}}">{{ service }}</a></button></br>
+                                <button class="btn btn-mute"><a class="page-link bg-dark text-white" href="professional/{{service}}">{{ service }}</a></button></br>
                             {% endfor %}
+                            <p class="py-3 text-dark">Contact us Now...</p>
                     </div>
                 </div>
-    {% endblock %}
             </div>
         </div>
+    {% endblock %}
 
-
+    {% block services-sm %}
+        <div class="container-fluid">
+            <div id="service-sm" class="col-sm-12 text-center my-3"> <!--hide in small screen-->
+                <div class="m-auto bg-white rounded">
+                    <h3 class="text-dark py-2">Services</h3>
+                    <div class="divider pt-1 bg-dark"></div>
+                    <br>
+                        {% for service in services %}
+                            <button class="btn btn-mute"><a class="page-link bg-dark text-white" href="professional/{{service}}">{{ service }}</a></button></br>
+                        {% endfor %}
+                        <p class="py-3 text-dark">Contact us Now...</p>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
 
     <!-- Professionals profile -->
     {% block card %}
-        {% for item in object_list %}
-            <h4>{{item.name }}</h4>
-            <p>{{ item.service }}</p>
-            <p>{{ item.qualification }}</p>
-            <p>{{ item.years_of_experience }}</p>
-            <button>{{ item.price }}</button>
-
-        {% endfor %}
+    <h3 class="text-center bg-danger text-white py-4">Check Our Esteemed Professionals</h3>
+        <div class="container">
+            <div class="row justify-content-center">
+                {% for item in object_list %}
+                <div class="col-lg-3 col-md-6 d-flex">
+                    <div class="card border-danger px-5 py-3 my-3 m-auto">
+                        <div class="card-title px-auto">
+                            <i class="fa-solid fa-user pe-3 pb-3"> </i><span class="h6">{{ item.name }}</span><br>
+                            <hr>
+                        </div>
+                        <div class="card-text">
+                            <i class="fa-solid fa-certificate pe-3"> </i><span>{{ item.service }}</span><br>
+                            <hr>
+                            <i class="fa-solid fa-user-graduate pe-3"> </i><span>{{ item.qualification }}</span><br>
+                            <i class="fa-solid fa-briefcase pe-3"> </i><span>{{ item.years_of_experience }} </span><br>
+                            <hr>
+                        </div>
+                        <div class="card-text text-center py-2">
+                            <a class="link text-white" href="tel:{{item.phone_number}}"><button class="btn btn-danger"> {{ item.price }}</button></a>
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     {% endblock %}
-
 </body>
 </html>

@@ -11,17 +11,22 @@
     <title>{% block title %} AnyWork {% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+    
+    
+    <!-- <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css"> -->
     <!-- <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"> -->
 
 
-    {%comment%} <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script> 
-    {%endcomment%}
+    <!-- <script src="{% static 'fontawesomefree/css/all.min.css' %}"></script>  -->
 
 </head>
 <body>
     <header>    
         {% block topic %}
-            <h1 class="px-5 py-3 mb-0">AnyWork</h1>
+            <a class="link" href="{% url 'home' %}"><h1 class="px-4 py-3 mb-0 text-white topic font-family-sans-serif"><i class="pe-2 fa-solid fa-handshake fa-shake"></i> AnyWork</h1></a>
         {% endblock %}
 
         
@@ -36,13 +41,17 @@
 
         {% block services %}
         {% endblock %}
+        
+        
+        {% block services-sm %}
+        {% endblock %}
     </header>
 
     {% block card %}
     {% endblock %}
 
 
-    <footer>
+    <footer class="bg-dark text-white text-center py-3">
         {% include "footer.html" %}
     </footer>
 </body>
