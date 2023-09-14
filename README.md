@@ -5,7 +5,9 @@ This is a web app where professionals can register andoffer their services to cl
 
 [anywork](anywork.onrender.com)
 
-[blog post](https://jubriltayo.medium.com/a-review-my-first-django-app-anywork-6deb96ec0371) 
+[blog post](https://jubriltayo.medium.com/a-review-my-first-django-app-anywork-6deb96ec0371)
+
+[linkedIn](https://www.linkedin.com/in/moshood-ogunjobi/) 
 
 [linkedIn](https://linkedin.com/in/jubril-tayo)
 
