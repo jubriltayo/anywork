@@ -5,16 +5,26 @@ from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 
+from .models import JobSeeker, Employer
+
 User = get_user_model()
 
 
-def create_user(**validated_data):
+def create_user(email, password, role, **extra_fields):
     """
-    Standard function to create a user with hashed password
+    Create a new user and their role specific profile (JobSeeker or Employer)
     """
+    if role not in [role[0] for role in User.USER_ROLE]:
+        raise ValidationError({"error": "Invalid role"})
+    
     try:
-        password = validated_data.pop('password', None)
-        user = User.objects.create_user(password=password, **validated_data)
+        user = User.objects.create_user(email=email, password=password, role=role, **extra_fields)
+        
+        if role == 'job_seeker':
+            JobSeeker.objects.create(user=user, **extra_fields)
+        elif role == 'employer':
+            Employer.objects.create(user=user, **extra_fields)
+        
         return user
     except IntegrityError:
         raise ValidationError({"error": "A user with this email already exists."})

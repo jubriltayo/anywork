@@ -27,3 +27,24 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class JobSeeker(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='job_seeker')
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
+
+class Employer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='employer')
+    company_name = models.CharField(max_length=255)
+    company_description = models.TextField(null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
+
+    def __str__(self):
+        return self.company_name
+    

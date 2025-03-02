@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, JobSeeker, Employer
 from .auth import create_user
 
 
@@ -15,12 +15,27 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['user_id', 'email', 'password', 'role', 'created_at', 'updated_at']
         read_only_fields = ['user_id', 'created_at', 'updated_at']
 
-    # To ensure password hashing
+    def validate_role(self, value):
+        # Ensure role is valid
+        if value not in [role[0] for role in User.USER_ROLE]:
+            raise serializers.ValidationError("Invalid role")
+        return value
+    
     def create(self, validated_data):
         user = create_user(**validated_data)
         return user
     
 
-# class LoginSerializer(serializers.Serializer):
-#     email = serializers.EmailField()
-#     password = serializers.CharField(max_length=128, write_only=True)
+class JobSeekerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobSeeker
+        fields = ['user', 'first_name', 'last_name', 'phone_number']
+        read_only_fields = ['user']
+
+
+
+class EmployerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employer
+        fields = ['user', 'company_name', 'company_description', 'website']
+        read_only_fields = ['user']

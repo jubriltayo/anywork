@@ -1,14 +1,14 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.conf import settings
 import requests
 
-from .models import User
-from .serializers import UserSerializer
+from .models import User, JobSeeker, Employer
+from .serializers import UserSerializer, JobSeekerSerializer, EmployerSerializer
 from .auth import create_user, authenticate_user_with_google, generate_tokens_for_user, authenticate_user
 
 
@@ -22,13 +22,12 @@ class UserRegistrationView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            user = create_user(**serializer.validated_data)
-            user_serializer = UserSerializer(user) # re-serialize to include the user_id
+            user = serializer.save() # calls create_user internally
             return Response({
                 "status": "success",
                 "message": "User registered successfully",
                 "data": {
-                    "user": user_serializer.data,
+                    "user": UserSerializer(user).data,
                 }
             }, status=status.HTTP_201_CREATED)
         return Response({
@@ -193,6 +192,66 @@ class UserViewSet(viewsets.ModelViewSet):
             "status": "success",
             "message": "Your account has been deleted successfully"
         }, status=status.HTTP_204_NO_CONTENT)
+
+
+class JobSeekerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint to manage job seekers
+    """
+    queryset = JobSeeker.objects.all()
+    serializer_class = JobSeekerSerializer
+    permission_class = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        # Disable POST/create for JobSeeker
+        return Response({
+            "status": "error",
+            "message": "JobSeeker profiles are created automatically during user registration. Use PUT/PATCH to update the profile."
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+    def get_queryset(self):
+        # Restrict users to only access their own profile
+        if self.request.user.role == 'job_seeker':
+            return JobSeeker.objects.filter(user=self.request.user)
+        elif self.request.user.role == 'admin':
+            return JobSeeker.objects.all()
+        else:
+            raise PermissionDenied("You do not have permission to access this resource.")
+
+
+class EmployerViewSet(viewsets.ModelViewSet):
+    queryset = Employer.objects.all()
+    serializer_class = EmployerSerializer
+    permission_class = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        # Disable POST/create for Employer
+        return Response({
+            "status": "error",
+            "message": "Employer profiles are created automatically during user registration. Use PUT/PATCH to update the profile."
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+    def get_queryset(self):
+        # Restrict users to only access their own profile
+        if self.request.user.role == 'employer':
+            return Employer.objects.filter(user=self.request.user)
+        elif self.request.user.role == 'admin':
+            return Employer.objects.all()
+        else:
+            raise PermissionDenied("You do not have permission to access this resource.")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
