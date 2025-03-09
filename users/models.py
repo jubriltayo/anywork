@@ -35,6 +35,10 @@ class JobSeeker(models.Model):
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = 'JobSeekers'
+        ordering = ['user']
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
@@ -44,6 +48,10 @@ class Employer(models.Model):
     company_name = models.CharField(max_length=255)
     company_description = models.TextField(null=True, blank=True)
     website = models.URLField(null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'Employers'
+        ordering = ['user']
 
     def __str__(self):
         return self.company_name

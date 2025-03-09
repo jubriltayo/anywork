@@ -10,14 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import environ
 import os
-from dotenv import load_dotenv
 from pathlib import Path
+
+# Initialize environmental variables
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+# read env
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -44,6 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # third party packages
+    'corsheaders',
+    'django_filters',
+    'django_celery_results',
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -58,13 +65,17 @@ INSTALLED_APPS = [
     # custom apps
     'users',
     'jobs',
+    'resumes',
     'applications',
-
+    'notifications',
+    'skills',
+    'analytics',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,9 +85,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'core.urls'
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Celery Settings
+CELERY_BROKER_URL = 'amqp://localhost' # RabbitMQ broker
+CELERY_ACCEPT_CONTENT = ['json'] # accepted content formats
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Celery Results Backend
+CELERY_RESULT_BACKEND = 'django-db'
 
 TEMPLATES = [
     {
@@ -107,19 +128,7 @@ DATABASES = {
     }
 }
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'SCOPE': ['profile', 'email'],
-#         'AUTH_PARAMS': {
-#             'access_type': 'online',
-#         },
-#         # 'APP': {
-#         #     'client_id': 'YOUR_GOOGLE_CLIENT_ID',  # Replace with your Google Client ID
-#         #     'secret': 'YOUR_GOOGLE_CLIENT_SECRET',  # Replace with your Google Client Secret
-#         #     'key': '',  # Optional key
-#         # }
-#     }
-# }
+
 
 AUTH_USER_MODEL = "users.User"
 
@@ -167,6 +176,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -240,6 +251,14 @@ SWAGGER_SETTINGS = {
 APPEND_SLASH = False
 
 # Google OAuth credentials
-GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
-GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
-GOOGLE_OAUTH_REDIRECT_URI = os.getenv('GOOGLE_OAUTH_REDIRECT_URI')  # Frontend redirect URI
+GOOGLE_OAUTH_CLIENT_ID = env('GOOGLE_OAUTH_CLIENT_ID')
+GOOGLE_OAUTH_CLIENT_SECRET = env('GOOGLE_OAUTH_CLIENT_SECRET')
+GOOGLE_OAUTH_REDIRECT_URI = env('GOOGLE_OAUTH_REDIRECT_URI')  # Frontend redirect URI
+
+# Email Backend
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# SMTP Settings
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = '2525'
