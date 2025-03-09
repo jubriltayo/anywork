@@ -170,5 +170,3 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Extras
-authorization_code_url.txt
