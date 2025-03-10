@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Use if running a Local PostgreSQL container
+      # postgres:
+      #   image: postgres:13
+      #   env:
+      #     POSTGRES_DB: ${{ secrets.DB_NAME }}
+      #     POSTGRES_USER: ${{ secrets.DB_USER }}
+      #     POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #   ports:
+      #     - "5432:5432"
+      #   options: >-
+      #     --health-cmd "pg_isready -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }}"
+      #     --health-interval 10s
+      #     --health-timeout 5s
+      #     --health-retries 5
+
+      rabbitmq:
+        image: rabbitmq:3.12-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc libpq-dev
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: 5432
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          source venv/bin/activate
+          python manage.py migrate
+
+      - name: Run tests
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: 5432
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          CELERY_BROKER_URL: amqp://localhost:5672
+        run: |
+          source venv/bin/activate
+          python manage.py test
+
+      - name: Build Docker image
+        run: docker build -t anywork-app .
+
