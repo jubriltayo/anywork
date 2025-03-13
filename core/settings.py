@@ -90,7 +90,7 @@ ROOT_URLCONF = 'core.urls'
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Celery Settings
-CELERY_BROKER_URL = 'amqp://localhost' # RabbitMQ broker
+CELERY_BROKER_URL = 'amqp://rabbitmq:5672' # 'amqp://localhost' # RabbitMQ broker
 CELERY_ACCEPT_CONTENT = ['json'] # accepted content formats
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

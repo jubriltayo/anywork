@@ -24,6 +24,23 @@ services:
       - .env
     command: gunicorn --bind 0.0.0.0:8000 core.wsgi:application
 
+  celery:
+    build: .
+    container_name: anywork-celery
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - CELERY_BROKER_URL=amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+      - web
+    env_file:
+      - .env
+    command: celery -A core worker --loglevel=info
+
   rabbitmq:
     image: rabbitmq:3.12-management
     container_name: anywork-rabbitmq
