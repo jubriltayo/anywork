@@ -16,6 +16,8 @@ services:
       - EMAIL_HOST_USER=${EMAIL_HOST_USER}
       - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
       - CELERY_BROKER_URL=amqp://rabbitmq:5672
+    volumes:
+      - ./staticfiles:/app/staticfiles
     ports:
       - "8000:8000"
     depends_on:
