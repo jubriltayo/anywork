@@ -148,14 +148,15 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', 'railway'),
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'dICeLraZHpKgeBjxNFEBTdENgqBUJbJL'),
-        'HOST': os.getenv('DB_HOST', 'postgres.railway.internal'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'HOST': os.getenv('DB_HOST', 'centerbeam.proxy.rlwy.net'),
+        'PORT': os.getenv('DB_PORT', '56842'),
         'OPTIONS': {
             'connect_timeout': 10,
             'sslmode': 'require',
         }
     }
 }
+
 
 
 
