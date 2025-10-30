@@ -14,6 +14,9 @@ class Analytics(models.Model):
     class Meta:
         verbose_name_plural = 'Analytics'
         ordering = ['-date']
+        constraints = [
+            models.UniqueConstraint(fields=['job', 'date'], name='unique_job_date')
+        ]
 
     def __str__(self):
         return f"Analytics for {self.job.title} on {self.date}"

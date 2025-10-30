@@ -6,7 +6,6 @@ from .models import Resume
 from .serializers import ResumeSerializer
 
 
-
 class ResumeViewSet(viewsets.ModelViewSet):
     queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
@@ -15,8 +14,11 @@ class ResumeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Automatically associate the resume with the logged-in job seeker
         if self.request.user.role == 'job_seeker':
-            job_seeker = self.request.user.job_seeker
-            serializer.save(job_seeker=job_seeker)
+            try:
+                job_seeker = self.request.user.job_seeker
+                serializer.save(job_seeker=job_seeker)
+            except Exception:
+                raise PermissionDenied("Job seeker profile not found. Please complete your profile first.")
         else:
             raise PermissionDenied("Only job seekers can upload resumes.")
 

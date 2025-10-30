@@ -4,20 +4,19 @@ from rest_framework.exceptions import PermissionDenied
 
 from .models import Application
 from .serializers import ApplicationSerializer
-from .permissions import IsJobSeeker, IsEmployer
+from .permissions import IsJobSeekerOrEmployer
 from analytics.utils import track_job_application
-from .tasks import send_application_creation_email
+# from .tasks import send_application_creation_email
 
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
-    permission_classes = [IsAuthenticated, IsJobSeeker, IsEmployer]
+    permission_classes = [IsAuthenticated, IsJobSeekerOrEmployer]
 
     def perform_create(self, serializer):
         user = self.request.user
-        print(user.email)
 
         # Automatically associate the application with the logged-in job seeker
         if hasattr(user, 'job_seeker'):
@@ -27,7 +26,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             track_job_application(application.job)
 
             # Notify user of job creation asynchronously
-            send_application_creation_email.delay(user.email)
+            # send_application_creation_email.delay(user.email)
 
         else:
             raise PermissionDenied("Job Seeker profile does not exist for this user.")
@@ -50,3 +49,9 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     
         else:
             return Application.objects.none()
+
+    def get_serializer_context(self):
+        """Add request to serializer context for building absolute URLs"""
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context

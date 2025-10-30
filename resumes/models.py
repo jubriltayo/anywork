@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 import hashlib
+import os
 
 from users.models import JobSeeker
 from .validators import validate_file_size, validate_file_extension
@@ -35,3 +36,17 @@ class Resume(models.Model):
         for chunk in self.file_path.chunks():
             sha256.update(chunk)
         return sha256.hexdigest()
+
+    def delete(self, *args, **kwargs):
+        # Override delete method to also delete the physical file
+        file_path = self.file_path.path
+        super().delete(*args, **kwargs)
+        self.delete_file(file_path)
+
+    def delete_file(self, file_path):
+        # Delete the physical file from storage
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"Error deleting file {file_path}: {e}")

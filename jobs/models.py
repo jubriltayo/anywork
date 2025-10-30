@@ -52,7 +52,7 @@ class Job(models.Model):
 
     class Meta:
         verbose_name_plural = 'Jobs'
-        ordering = ['title']
+        ordering = ['-posted_at']
 
     def __str__(self):
         return self.title
