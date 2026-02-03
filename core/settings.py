@@ -131,33 +131,20 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': env('DB_NAME'),
-#         'USER': env('DB_USER'),
-#         'PASSWORD': env('DB_PASSWORD'),
-#         'HOST': env('DB_HOST'),
-#         'PORT': env('DB_PORT'),
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'railway'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'dICeLraZHpKgeBjxNFEBTdENgqBUJbJL'),
-        'HOST': os.getenv('DB_HOST', 'centerbeam.proxy.rlwy.net'),
-        'PORT': os.getenv('DB_PORT', '56842'),
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres.ybxafcmyuuvipoyframe'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Lz6ITBBWOqdsVG2v'),
+        'HOST': os.getenv('DB_HOST', 'aws-1-eu-west-1.pooler.supabase.com'),
+        'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
-            'connect_timeout': 10,
             'sslmode': 'require',
+            'connect_timeout': 10,
         }
     }
 }
-
-
 
 
 AUTH_USER_MODEL = "users.User"
