@@ -445,8 +445,8 @@ anywork_backend/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/jubriltayo/anywork-backend.git
-cd anywork-backend
+git clone https://github.com/jubriltayo/anywork.git
+cd anywork
 ```
 
 ### 2. Install Dependencies
