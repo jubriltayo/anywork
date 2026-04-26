@@ -23,6 +23,8 @@ class ResumeViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Only job seekers can upload resumes.")
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Resume.objects.none()
         # Restrict users to only access their own resumes
         if self.request.user.role == 'job_seeker':
             return Resume.objects.filter(job_seeker=self.request.user.job_seeker)

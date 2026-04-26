@@ -23,7 +23,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'status', 
             'applied_at'
         ]
-        read_only_fields = ['application_id', 'applied_at']
+        read_only_fields = ['application_id', 'applied_at', 'job_seeker']
 
     def get_job_seeker_details(self, obj):
         """Get job seeker details for the application"""
@@ -41,7 +41,10 @@ class ApplicationSerializer(serializers.ModelSerializer):
         resume = obj.resume
         if resume and resume.file_path:
             # Build absolute URL for the file
-            file_url = self.context['request'].build_absolute_uri(resume.file_path.url)
+            request = self.context.get('request')
+            file_url = None
+            if request:
+                file_url = request.build_absolute_uri(resume.file_path.url)
             return {
                 'resume_id': resume.resume_id,
                 'file_url': file_url,

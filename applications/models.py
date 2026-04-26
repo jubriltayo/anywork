@@ -5,7 +5,6 @@ from users.models import JobSeeker
 from jobs.models import Job
 from resumes.models import Resume
 from notifications.models import Notification
-from .tasks import send_application_status_change_notification
 
 
 
@@ -28,6 +27,12 @@ class Application(models.Model):
     class Meta:
         verbose_name_plural = 'Applications'
         ordering = ['-applied_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['job_seeker', 'job'],
+                name='unique_application_per_job'
+            )
+        ]
 
     def save(self, *args, **kwargs):
         # Fetch the old status before saving (if application exists)
@@ -50,7 +55,9 @@ class Application(models.Model):
             )
 
             # Trigger task to send an email notification
-            send_application_status_change_notification(self.application_id)
+            from utils.async_handler import run_task
+            from .tasks import send_application_status_change_notification
+            run_task(send_application_status_change_notification, self.application_id)
 
     def __str__(self):
         return f"Application {self.application_id} for {self.job}"

@@ -12,6 +12,9 @@ class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Skill.objects.none()
+        
         user = self.request.user
 
         # If user is a job seeker, return skills associated with their profile
@@ -23,7 +26,7 @@ class SkillViewSet(viewsets.ModelViewSet):
             if hasattr(user, 'employer'):
                 jobs = user.employer.jobs.all()
                 applications = Application.objects.filter(job__in=jobs)
-                users = [application.job_seeker.user for application in applications]
+                users = applications.values_list('job_seeker__user', flat=True)
                 # get all skills of job seekers who applied for their job
                 return Skill.objects.filter(user__in=users).distinct()
             else:

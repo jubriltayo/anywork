@@ -6,11 +6,11 @@ from .manager import UserManager
 
 
 class User(AbstractUser):
-    USER_ROLE = {
+    USER_ROLE = [
         ('job_seeker', 'Job Seeker'),
         ('employer', 'Employer'),
         ('admin', 'Admin')
-    }
+    ]
 
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)

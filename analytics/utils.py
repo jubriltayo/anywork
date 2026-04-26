@@ -1,7 +1,11 @@
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import F
+import logging
+
 from .models import Analytics
+
+logger = logging.getLogger(__name__)
 
 def track_job_view(job):
     """
@@ -26,7 +30,7 @@ def track_job_view(job):
                 ).update(views=F('views') + 1)
                 
     except Exception as e:
-        print(f"Error tracking job view: {e}")
+        logger.error(f"Error tracking job view: {e}")
 
 def track_job_application(job):
     """
@@ -51,4 +55,4 @@ def track_job_application(job):
                 ).update(applications=F('applications') + 1)
                 
     except Exception as e:
-        print(f"Error tracking job application: {e}")
+        logger.error(f"Error tracking job application: {e}")

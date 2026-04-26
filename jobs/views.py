@@ -12,16 +12,16 @@ from analytics.utils import track_job_view
 
 
 
-class LocationViewSet(viewsets.ModelViewSet):
+class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-    permission_classes = [IsEmployerReadWrite]
+    permission_classes = [IsAuthenticated]
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsEmployerReadWrite]
+    permission_classes = [IsAuthenticated]
 
 
 class JobViewSet(viewsets.ModelViewSet):
