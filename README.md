@@ -133,7 +133,7 @@ Email tasks are dispatched via Celery in environments where a broker is availabl
 def run_task(task, *args, **kwargs):
     if settings.USE_ASYNC_TASKS:
         return task.delay(*args, **kwargs)
-    return task(*args, **kwargs)
+    return task.run(*args, **kwargs)
 
 # Usage — identical regardless of environment
 run_task(send_application_creation_email, user.email)
