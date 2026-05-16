@@ -7,19 +7,14 @@ from .models import Notification
 from .serializers import NotificationSerializer
 
 
-class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Notification.objects.all()
+class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Notification.objects.none()
-        
-        # Restrict users to only access their own notifications
         return Notification.objects.filter(user=self.request.user)
     
-    @action(detail=True, methods=['patch'], url_path='mark-as-read')
+    @action(detail=True, methods=['post'], url_path='mark-as-read')
     def mark_as_read(self, request, pk=None):
         notification = self.get_object()
         notification.is_read = True

@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .filters import JobFilter
@@ -15,13 +15,13 @@ from analytics.utils import track_job_view
 class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 class JobViewSet(viewsets.ModelViewSet):
@@ -30,7 +30,7 @@ class JobViewSet(viewsets.ModelViewSet):
     Returns all active jobs for everyone to read.
     """
     serializer_class = JobSerializer
-    permission_classes = [IsEmployerWriteOnly]  # Updated permission
+    permission_classes = [IsEmployerWriteOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = JobFilter
     search_fields = ['title', 'description', 'location__city', 'category__name']
@@ -69,4 +69,3 @@ class EmployerJobViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         serializer.save(employer=user.employer)
-
