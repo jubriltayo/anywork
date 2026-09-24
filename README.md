@@ -33,7 +33,7 @@ AnyWork is a full-featured job board backend built with Django and PostgreSQL. I
 
 ## 🎯 Overview
 
-AnyWork connects job seekers with employers through a structured REST API with strict role enforcement at every layer. The system handles the full hiring workflow: job postings, resume uploads, applications, status transitions, and email notifications, all with production-grade reliability patterns.
+AnyWork connects job seekers with employers through a structured REST API with role enforcement at the queryset and permission layers. The system handles the hiring workflow: job postings, resume uploads, applications, status updates, and email notifications.
 
 ### What This API Does
 
@@ -42,7 +42,7 @@ AnyWork connects job seekers with employers through a structured REST API with s
 - ✅ Job postings with full-text search, category, location, and type filtering
 - ✅ Dual job viewset — public browsing (`/jobs/`) and employer management (`/employer/jobs/`)
 - ✅ Resume upload with SHA-256 duplicate detection and physical file cleanup on delete
-- ✅ Application tracking with role-restricted status transitions
+- ✅ Application tracking with role-restricted status updates
 - ✅ Atomic view and application count tracking using database-level `F()` expressions
 - ✅ In-app notifications triggered automatically on application status changes
 - ✅ Async email delivery via Celery + RabbitMQ, with graceful synchronous fallback
@@ -150,10 +150,16 @@ When an employer updates an application status, two things happen automatically:
 ```python
 # applications/models.py
 def save(self, *args, **kwargs):
-    old_status = Application.objects.get(pk=self.pk).status if self.pk else None
+    old_status = None
+    if self.pk:
+        try:
+            old_status = Application.objects.get(pk=self.pk).status
+        except Application.DoesNotExist:
+            pass
+
     super().save(*args, **kwargs)
 
-    if old_status and old_status != self.status:
+    if old_status is not None and old_status != self.status:
         Notification.objects.create(
             user=self.job_seeker.user,
             message=f"Your application for {self.job.title} has been {self.status}"
