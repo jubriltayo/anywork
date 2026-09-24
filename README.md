@@ -12,7 +12,7 @@ AnyWork is a full-featured job board backend built with Django and PostgreSQL. I
 
 **Live API:** [anywork.onrender.com](https://anywork.onrender.com/)  
 **API Docs:** [anywork.onrender.com](https://anywork.onrender.com/)  
-**Frontend:** [AnyWork Frontend Repository](https://github.com/jubriltayo/anywork-frontend)
+**Frontend:** [AnyWork Frontend Repository](https://github.com/jubriltayo/anywork_frontend)
 
 ---
 
