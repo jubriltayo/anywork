@@ -169,33 +169,35 @@ def save(self, *args, **kwargs):
 
 ```mermaid
 graph TD
-    Client[Client / Frontend] --> Auth[Auth Layer]
-
+    Client[Client / Frontend] --> Auth[Auth Layer<br/>register · login]
     Auth --> |JWT Token| API[Django REST API]
 
-    API --> Users[Users App<br/>JobSeeker · Employer]
+    API --> Users[Users App<br/>User · JobSeeker · Employer]
     API --> Jobs[Jobs App<br/>Job · Location · Category]
     API --> Applications[Applications App<br/>Application]
     API --> Resumes[Resumes App<br/>Resume · Checksum]
-    API --> Notifications[Notifications App]
-    API --> Skills[Skills App]
+    API --> Notifications[Notifications App<br/>Notification]
+    API --> Skills[Skills App<br/>Skill]
     API --> Analytics[Analytics App]
 
-    Applications --> |Status Change| NotifPipeline[Notification Pipeline]
-    NotifPipeline --> InApp[In-App Notification]
-    NotifPipeline --> AsyncHandler[run_task]
-    AsyncHandler --> |USE_ASYNC_TASKS=True| Celery[Celery Worker]
-    AsyncHandler --> |USE_ASYNC_TASKS=False| SyncEmail[Synchronous Email]
-    Celery --> RabbitMQ[RabbitMQ Broker]
-    RabbitMQ --> SMTP[SMTP Provider]
+    Applications --> |create| AppTracker[Atomic Application Counter]
+    Applications --> |create: confirmation email| AsyncHandler[run_task]
+    Applications --> |save: status changed| NotifPipeline[Status-Change Pipeline]
+    NotifPipeline --> |Notification.objects.create| Notifications
+    NotifPipeline --> |status email| AsyncHandler
+
+    AsyncHandler --> |USE_ASYNC_TASKS=True<br/>task.delay| RabbitMQ[RabbitMQ Broker]
+    RabbitMQ --> Celery[Celery Worker]
+    Celery --> SMTP[SMTP Provider]
+    AsyncHandler --> |USE_ASYNC_TASKS=False<br/>task.run| SyncEmail[Synchronous Email]
     SyncEmail --> SMTP
 
     Jobs --> |retrieve| AnalyticsTracker[Atomic View Counter]
-    Applications --> |create| AppTracker[Atomic Application Counter]
     AnalyticsTracker --> DB[(PostgreSQL)]
     AppTracker --> DB
+    Notifications --> DB
 
-    Resumes --> |SHA-256| DupeCheck[Duplicate Detection]
+    Resumes --> |SHA-256 in serializer| DupeCheck[Duplicate Detection]
     DupeCheck --> DB
 
     style API fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
@@ -208,34 +210,58 @@ graph TD
 
 ```mermaid
 graph LR
+    subgraph "Anonymous"
+        AN_Jobs[Browse active jobs, categories, locations]
+    end
+
     subgraph "Job Seeker"
-        JS_Jobs[Browse all active jobs]
-        JS_Apply[Submit applications]
-        JS_Resume[Upload resumes]
+        JS_Profile[View and edit own profile]
+        JS_Apply[Submit and view own applications]
+        JS_Resume[Upload and manage own resumes]
         JS_Skills[Manage own skills]
         JS_Notif[View own notifications]
         JS_Analytics[View analytics for applied jobs]
     end
 
     subgraph "Employer"
+        EM_Profile[View and edit own profile]
         EM_PostJob[Post and manage own jobs]
         EM_ViewApps[View applications to own jobs]
         EM_UpdateStatus[Update application status]
         EM_ViewSkills[View applicant skills]
-        EM_Analytics[View analytics for own job postings]
+        EM_Analytics[View analytics for own jobs]
+    end
+
+    subgraph "Admin"
+        AD_Users[List all users and profiles]
     end
 
     subgraph "Data Boundary"
+        DB_Users[(Users and profiles)]
         DB_Jobs[(Jobs)]
         DB_Apps[(Applications)]
         DB_Resumes[(Resumes)]
+        DB_Skills[(Skills)]
+        DB_Notifs[(Notifications)]
+        DB_Analytics[(Analytics)]
     end
 
-    JS_Jobs --> DB_Jobs
+    AN_Jobs --> DB_Jobs
+    JS_Profile --> DB_Users
     JS_Apply --> DB_Apps
+    JS_Resume --> DB_Resumes
+    JS_Skills --> DB_Skills
+    JS_Notif --> DB_Notifs
+    JS_Analytics --> DB_Analytics
+    EM_Profile --> DB_Users
     EM_PostJob --> DB_Jobs
     EM_ViewApps --> DB_Apps
-    JS_Resume --> DB_Resumes
+    EM_UpdateStatus --> DB_Apps
+    EM_UpdateStatus -.-> |notifies job seeker| DB_Notifs
+    EM_ViewApps -.-> |resume file URL only| DB_Resumes
+    EM_ViewSkills --> DB_Skills
+    EM_Analytics --> DB_Analytics
+    AD_Users --> DB_Users
 ```
 
 ### Request Flow: Application Status Change
@@ -243,31 +269,39 @@ graph LR
 ```mermaid
 sequenceDiagram
     participant Employer
-    participant API as Django API
+    participant API as ApplicationViewSet
+    participant Model as Application.save()
     participant DB as PostgreSQL
     participant Handler as run_task()
+    participant MQ as RabbitMQ
     participant Celery
     participant SMTP
 
-    Employer->>API: PATCH /api/applications/{id}/ {status: "accepted"}
-    API->>API: Check IsJobSeekerOrEmployer permission
-    API->>API: Check employer owns the job (object permission)
-    API->>API: Block if request.user is job_seeker (status lock)
-    API->>DB: Save updated application
-    DB->>DB: Model.save() detects status change
-    DB->>DB: Create Notification record
-    DB->>Handler: run_task(send_email, application_id)
+    Employer->>API: PATCH /api/applications/{id}/ with status accepted
+    API->>API: IsAuthenticated + IsJobSeekerOrEmployer
+    API->>DB: get_queryset() filters job__employer = user.employer
+    Note over API,DB: Not the owner means not in queryset, so 404
+    API->>API: perform_update rejects job_seeker sending status (403)
+    API->>Model: serializer.save()
+    Model->>DB: SELECT old status
+    Model->>DB: UPDATE application
 
-    alt USE_ASYNC_TASKS=True
-        Handler->>Celery: task.delay(application_id)
-        Celery->>DB: Fetch application + job seeker email
-        Celery->>SMTP: Send status update email
-    else USE_ASYNC_TASKS=False
-        Handler->>DB: Fetch application + job seeker email
-        Handler->>SMTP: Send status update email (synchronous)
+    opt status changed
+        Model->>DB: INSERT Notification for job_seeker.user
+        Model->>Handler: run_task(send_application_status_change_notification, application_id)
+
+        alt USE_ASYNC_TASKS=True
+            Handler->>MQ: task.delay(application_id)
+            MQ->>Celery: deliver task
+            Celery->>DB: Fetch application + job seeker email
+            Celery->>SMTP: Send status update email
+        else USE_ASYNC_TASKS=False
+            Handler->>DB: Fetch application + job seeker email
+            Handler->>SMTP: Send email synchronously (task.run)
+        end
     end
 
-    API-->>Employer: 200 OK — updated application data
+    API-->>Employer: 200 OK with updated application
 ```
 
 ---
@@ -423,12 +457,12 @@ anywork_backend/
 ├── skills/
 │   └── views.py             # Job seeker sees own; employer sees applicants' skills
 │
-├── utils/
-│   └── async_handler.py     # run_task() — Celery or sync based on USE_ASYNC_TASKS
-│
-└── users/management/
-    └── commands/
-        └── seed_data.py     # Full database seeder for demo and testing
+└── utils/
+    ├── async_handler.py
+    └── management/
+        └── commands/
+            └── seed.py      # Full database seeder for demo and testing
+
 ```
 
 ---
@@ -496,7 +530,7 @@ uv run manage.py migrate
 ### 5. Seed Demo Data *(optional)*
 
 ```bash
-uv run manage.py seed_data
+uv run manage.py seed
 ```
 
 This creates job seekers, employers, job postings, applications, skills, and analytics records, all with realistic data. Seeded credentials are printed to stdout.
