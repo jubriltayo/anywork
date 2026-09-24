@@ -1,6 +1,6 @@
 # 💼 AnyWork
 
-> **Production-ready job board REST API with role-based access control, atomic analytics, async email notifications, and SHA-256 resume deduplication**
+> **Job board REST API with role-based access control, atomic analytics, toggleable async email notifications, and SHA-256 resume deduplication**
 
 AnyWork is a full-featured job board backend built with Django and PostgreSQL. It serves two distinct user types (job seekers and employers), each with their own isolated data surface, permissions, and notification pipeline. The API is fully deployed and documented via an interactive Swagger UI.
 
